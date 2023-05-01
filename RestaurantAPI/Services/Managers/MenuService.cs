@@ -27,6 +27,24 @@ namespace RestaurantAPI.Services.Managers
             return _mapper.Map<List<MenuDTO>>(menuEntities);
         }
 
+        public PagedResult<Menu> GetAllMenusOrderedByName(int pageNumber, int pageSize)
+        {
+            var totalItems = _menuUnit.Menus.GetTotalCount();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var menus =  _menuUnit.Menus.GetPaginatedList(pageNumber, pageSize);
+
+            return new PagedResult<Menu>
+            {
+                Items = menus.Items,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                CurrentPage = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
+
         public MenuDTO GetMenuDetails(int id)
         {
             var menuEntity = _menuUnit.Menus.GetMenuDetails(id);

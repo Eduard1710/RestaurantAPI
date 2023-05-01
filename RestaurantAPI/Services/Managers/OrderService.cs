@@ -63,5 +63,22 @@ namespace RestaurantAPI.Services.Managers
             return _mapper.Map<OrderDTO>(orderEntity);
         }
 
+        public PagedResult<Order> GetAllOrdersOrderedByAddress(int pageNumber, int pageSize)
+        {
+            var totalItems = _orderUnit.Orders.GetTotalCount();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var orders = _orderUnit.Orders.GetPaginatedList(pageNumber, pageSize);
+
+            return new PagedResult<Order>
+            {
+                Items = orders.Items,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                CurrentPage = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
     }
 }

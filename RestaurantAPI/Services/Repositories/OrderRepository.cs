@@ -20,5 +20,31 @@ namespace RestaurantAPI.Services.Repositories
                 .Include(o=>o.OrderMenu)
                 .FirstOrDefault();
         }
+        public PagedResult<Order> GetPaginatedList(int pageNumber, int pageSize)
+        {
+            var totalItems = _context.Orders.Where(o => o.Deleted == false || o.Deleted == null).Count();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var orders = _context.Orders
+                .Where(o => o.Deleted == false || o.Deleted == null)
+                .OrderBy(e => e.Address)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PagedResult<Order>
+            {
+                Items = orders,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                CurrentPage = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
+        public int GetTotalCount()
+        {
+            return _context.Orders.Where(o => o.Deleted == false || o.Deleted == null).Count();
+        }
     }
 }

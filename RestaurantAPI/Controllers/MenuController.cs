@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RestaurantAPI.Entities;
 using RestaurantAPI.ExternalModels;
+using RestaurantAPI.Services;
 using RestaurantAPI.Services.Managers;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace RestaurantAPI.Controllers
 {
@@ -25,6 +28,21 @@ namespace RestaurantAPI.Controllers
             }
             return Ok(menuEntity);
         }
+
+        [HttpGet]
+        [Route("ordered-by-name", Name = "GetAllMenusOrderedByName")]
+        [ProducesResponseType(typeof(PagedResult<MenuDTO>), StatusCodes.Status200OK)]
+        [Produces("application/json")]
+        public IActionResult GetAllMenusOrderedByName([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var menuEntities = _menuService.GetAllMenusOrderedByName(pageNumber,pageSize);
+            if (menuEntities == null)
+            {
+                return NotFound();
+            }
+            return Ok(menuEntities);
+        }
+
         [HttpGet]
         [Route("", Name = "GetAllMenus")]
         public IActionResult GetAllMenus()
@@ -36,6 +54,7 @@ namespace RestaurantAPI.Controllers
             }
             return Ok(menuEntities);
         }
+
         [HttpGet]
         [Route("details/{id}", Name = "GetMenuDetails")]
         public IActionResult GetMenuDetails(int id)

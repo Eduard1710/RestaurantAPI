@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RestaurantAPI.ExternalModels;
+using RestaurantAPI.Services;
 using RestaurantAPI.Services.Managers;
 using RestaurantAPI.Services.UnitsOfWork;
 
@@ -38,6 +39,20 @@ namespace RestaurantAPI.Controllers
             }
             return Ok(orderEntities);
         }
+        [HttpGet]
+        [Route("ordered-by-address", Name = "GetAllOrdersOrderedByAddress")]
+        [ProducesResponseType(typeof(PagedResult<OrderDTO>), StatusCodes.Status200OK)]
+        [Produces("application/json")]
+        public IActionResult GetAllOrdersOrderedByAddress([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var orderEntities = _orderService.GetAllOrdersOrderedByAddress(pageNumber, pageSize);
+            if (orderEntities == null)
+            {
+                return NotFound();
+            }
+            return Ok(orderEntities);
+        }
+
         [HttpGet]
         [Route("details/{id}", Name = "GetOrderDetails")]
         public IActionResult GetOrderDetails(int id)
