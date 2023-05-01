@@ -54,6 +54,13 @@ namespace RestaurantAPI.Controllers
             var mEntity = _menuService.AddMenu(menu);
             return Ok(mEntity);
         }
+        [HttpPut]
+        [Route("{id}", Name = "UpdateMenu")]
+        public IActionResult UpdateMenu([FromBody] UpdateMenuDTO menu)
+        {
+            var menuEntity = _menuService.UpdateMenu(menu);
+            return Ok(menuEntity);
+        }
         [HttpGet]
         [Route("category/{categoryId}", Name = "GetCategoryDetails")]
         public IActionResult GetCategoryDetails(int categoryId)

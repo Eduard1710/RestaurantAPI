@@ -36,5 +36,26 @@ namespace RestaurantAPI.Services.Managers
             _userUnit.Complete();
             return _mapper.Map<UserDTO>(userEntity);
         }
+
+        public bool DeleteUser(int id)
+        {
+            var userEntity = _userUnit.Users.Get(id);
+            if (userEntity == null)
+            {
+                return false;
+            }
+            userEntity.Deleted = true;
+            _userUnit.Users.Remove(userEntity);
+            _userUnit.Complete();
+            return true;
+        }
+
+        public UserDTO UpdateUser(UpdateUserDTO user)
+        {
+            var userEntity = _mapper.Map<User>(user);
+            _userUnit.Users.Update(userEntity);
+            _userUnit.Complete();
+            return _mapper.Map<UserDTO>(userEntity);
+        }
     }
 }

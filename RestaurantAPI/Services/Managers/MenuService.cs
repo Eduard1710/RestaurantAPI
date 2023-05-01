@@ -59,5 +59,12 @@ namespace RestaurantAPI.Services.Managers
             _menuUnit.Complete();
             return true;
         }
+        public MenuDTO UpdateMenu(UpdateMenuDTO menu)
+        {
+            var menuEntity = _mapper.Map<Menu>(menu);
+            _menuUnit.Menus.Update(menuEntity);
+            _menuUnit.Complete();
+            return _mapper.Map<MenuDTO>(menuEntity);
+        }
     }
 }

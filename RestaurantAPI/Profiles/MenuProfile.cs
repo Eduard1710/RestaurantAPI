@@ -10,6 +10,9 @@ namespace RestaurantAPI.Profiles
             CreateMap<Menu, ExternalModels.MenuDTO>();
             CreateMap<ExternalModels.MenuDTO, Menu>();
 
+            CreateMap<Menu, ExternalModels.UpdateMenuDTO>();
+            CreateMap<ExternalModels.UpdateMenuDTO, Menu>();
+
             CreateMap<Category, ExternalModels.CategoryDTO>();
             CreateMap<ExternalModels.CategoryDTO, Category>();
         }

@@ -37,6 +37,24 @@ namespace RestaurantAPI.Controllers
             }
             return Ok(userEntities);
         }
+        [HttpDelete]
+        [Route("delete/{id}", Name = "DeleteUser")]
+        public IActionResult DeleteUser(int id)
+        {
+            var deleteUser = _userService.DeleteUser(id);
+            if (deleteUser == false)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+        [HttpPut]
+        [Route("{id}", Name = "UpdateUser")]
+        public IActionResult UpdateUser([FromBody] UpdateUserDTO user)
+        {
+            var userEntity = _userService.UpdateUser(user);
+            return Ok(userEntity);
+        }
         [Route("Register", Name = "Register new account")]
         [HttpPost]
         public IActionResult Register([FromBody] UserDTO user)

@@ -9,6 +9,9 @@ namespace RestaurantAPI.Profiles
         {
             CreateMap<User, ExternalModels.UserDTO>();
             CreateMap<ExternalModels.UserDTO, User>();
+
+            CreateMap<User, ExternalModels.UpdateUserDTO>();
+            CreateMap<ExternalModels.UpdateUserDTO, User>();
         }
     }
 }
