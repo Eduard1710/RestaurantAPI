@@ -55,7 +55,7 @@ namespace RestaurantAPI.Services.Managers
             return true;
         }
 
-        public OrderDTO UpdateOrder(OrderDTO order)
+        public OrderDTO UpdateOrder(UpdateOrderDTO order)
         {
             var orderEntity = _mapper.Map<Order>(order);
             _orderUnit.Orders.Update(orderEntity);
