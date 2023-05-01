@@ -79,14 +79,5 @@ namespace RestaurantAPI.Controllers
             return Ok(new { token = jwtToken });
         }
 
-        //[Route("Register", Name = "Register new account")]
-        //[HttpPost]
-        //public IActionResult RegisterUser([FromBody] UserDTO user)
-        //{
-        //    var userEntity = _userService.AddUser(user);
-
-        //    return Ok(userEntity);
-        //}
-
     }
 }
