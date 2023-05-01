@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RestaurantAPI.ExternalModels;
 using RestaurantAPI.Services;
 using RestaurantAPI.Services.Managers;
@@ -8,6 +9,7 @@ namespace RestaurantAPI.Controllers
 {
     [Route("order")]
     [ApiController]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         private readonly OrderService _orderService;

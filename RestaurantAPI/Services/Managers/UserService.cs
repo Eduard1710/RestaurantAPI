@@ -9,12 +9,15 @@ namespace RestaurantAPI.Services.Managers
     {
         private readonly IUserUnitOfWork _userUnit;
         private readonly IMapper _mapper;
+        private readonly AuthorizationService authService;
 
         public UserService(IUserUnitOfWork userunit,
-            IMapper mapper)
+            IMapper mapper,
+            AuthorizationService authorizationService)
         {
             _userUnit = userunit ?? throw new ArgumentNullException(nameof(userunit));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            authService = authorizationService;
         }
 
         public UserDTO GetUser(int id)
@@ -35,6 +38,45 @@ namespace RestaurantAPI.Services.Managers
             _userUnit.Users.Add(userEntity);
             _userUnit.Complete();
             return _mapper.Map<UserDTO>(userEntity);
+        }
+
+        public void Register(UserDTO registerUser)
+        {
+            if (registerUser == null)
+            {
+                return;
+            }
+
+            var hashedPassword = authService.HashPassword(registerUser.PasswordHash);
+            var user = new User
+            {
+                FirstName = registerUser.FirstName,
+                LastName = registerUser.LastName,
+                Email = registerUser.Email,
+                PasswordHash = hashedPassword,
+                IsAdmin = registerUser.IsAdmin
+            };
+            _userUnit.Users.Add(user);
+            _userUnit.Complete();
+        }
+
+        public string? Validate(LoginDTO payload)
+        {
+            var user = _userUnit.Users.GetUserByEmail(payload.Email);
+
+            var passwordFine = authService.VerifyHashedPassword(user.PasswordHash, payload.Password);
+
+            if (passwordFine)
+            {
+                var role = user.IsAdmin == true ? "ADMIN" : "USER";
+
+                return authService.GetToken(user, role);
+            }
+            else
+            {
+                return null;
+            }
+
         }
 
         public bool DeleteUser(int id)

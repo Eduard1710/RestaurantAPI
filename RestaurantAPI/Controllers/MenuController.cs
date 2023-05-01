@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RestaurantAPI.Entities;
 using RestaurantAPI.ExternalModels;
 using RestaurantAPI.Services;
@@ -9,6 +10,7 @@ namespace RestaurantAPI.Controllers
 {
     [Route("menu")]
     [ApiController]
+    [Authorize]
     public class MenuController : ControllerBase
     {
         private readonly MenuService _menuService;
