@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using RestaurantAPI.Services.Managers;
 using Microsoft.AspNetCore.Authorization;
+using RestaurantAPI.Infrastructure.Exceptions;
 
 namespace RestaurantAPI.Controllers
 {
-    [Route("user")]
+    [Route("User")]
     [ApiController]
     [Authorize]
     public class UserController : ControllerBase
@@ -22,61 +23,98 @@ namespace RestaurantAPI.Controllers
         [Authorize(Roles = "ADMIN")]
         public IActionResult GetUser(int id)
         {
-            var userEntity = _userService.GetUser(id);
-            if (userEntity == null)
+            try
             {
-                return NotFound();
+                var userEntity = _userService.GetUser(id);
+                return Ok(userEntity);
             }
-            return Ok(userEntity);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
         [HttpGet]
         [Route("", Name = "GetAllUsers")]
         [Authorize(Roles = "ADMIN")]
         public IActionResult GetAllUsers()
         {
-            var userEntities = _userService.GetAllUsers();
-            if (userEntities == null)
+            try
             {
-                return NotFound();
+                var userEntities = _userService.GetAllUsers();
+                return Ok(userEntities);
             }
-            return Ok(userEntities);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
         [HttpDelete]
-        [Route("delete/{id}", Name = "DeleteUser")]
+        [Route("Delete/{id}", Name = "DeleteUser")]
         [Authorize(Roles = "ADMIN")]
         public IActionResult DeleteUser(int id)
         {
-            var deleteUser = _userService.DeleteUser(id);
-            if (deleteUser == false)
+            try
             {
-                return NotFound();
+                var deleteUser = _userService.DeleteUser(id);
+                return NoContent();
             }
-            return NoContent();
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+        
         [HttpPut]
         [Route("{id}", Name = "UpdateUser")]
         [Authorize(Roles = "ADMIN")]
         public IActionResult UpdateUser([FromBody] UpdateUserDTO user)
         {
-            var userEntity = _userService.UpdateUser(user);
-            return Ok(userEntity);
+            try
+            {
+                var userEntity = _userService.UpdateUser(user);
+                return Ok(userEntity);
+            }
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        [HttpPost("register")]
+        [HttpPost("Register")]
         [AllowAnonymous]
         public IActionResult Register(UserDTO payload)
         {
-            _userService.Register(payload);
-            return Ok();
+            try
+            {
+                _userService.Register(payload);
+                return Ok();
+            }
+            catch (ResourceAlreadyExistsException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         [AllowAnonymous]
         public IActionResult Login(LoginDTO payload)
         {
-            var jwtToken = _userService.Validate(payload);
+            try
+            {
+                var jwtToken = _userService.Validate(payload);
 
-            return Ok(new { token = jwtToken });
+                return Ok(new { token = jwtToken });
+            }
+            catch (InvalidCredentialsException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

@@ -42,7 +42,7 @@ namespace RestaurantAPI.Services.Managers
                 Issuer = "Backend",
                 Audience = "Frontend",
                 Subject = new ClaimsIdentity(new[] { roleClaim, idClaim, infoClaim }),
-                Expires = DateTime.Now.AddMinutes(5),
+                Expires = DateTime.Now.AddHours(5),
                 SigningCredentials = credentials
             };
 

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RestaurantAPI.Entities;
 using RestaurantAPI.ExternalModels;
+using RestaurantAPI.Infrastructure.Exceptions;
 using RestaurantAPI.Services.UnitsOfWork;
 
 namespace RestaurantAPI.Services.Managers
@@ -23,29 +24,29 @@ namespace RestaurantAPI.Services.Managers
         public UserDTO GetUser(int id)
         {
             var userEntity = _userUnit.Users.Get(id);
+            if (userEntity == null)
+                throw new ResourceMissingException($"User with id {id} doesn't exist!");
             return _mapper.Map<UserDTO>(userEntity);
         }
 
         public List<UserDTO> GetAllUsers()
         {
             var userEntities = _userUnit.Users.Find(u => u.Deleted == false || u.Deleted == null);
+            if (userEntities == null)
+                throw new ResourceMissingException("No user found!");
             return _mapper.Map<List<UserDTO>>(userEntities);
-        }
-
-        public UserDTO AddUser(UserDTO user)
-        {
-            var userEntity = _mapper.Map<User>(user);
-            _userUnit.Users.Add(userEntity);
-            _userUnit.Complete();
-            return _mapper.Map<UserDTO>(userEntity);
         }
 
         public void Register(UserDTO registerUser)
         {
             if (registerUser == null)
             {
-                return;
+                throw new ResourceMissingException("No register data found!");
             }
+            var hasEmailConflict = _userUnit.Users
+                .Any(c => c.Email == registerUser.Email);
+            if (hasEmailConflict)
+                throw new ResourceAlreadyExistsException($"User with email {registerUser.Email} already exists!");
 
             var hashedPassword = authService.HashPassword(registerUser.PasswordHash);
             var user = new User
@@ -64,6 +65,9 @@ namespace RestaurantAPI.Services.Managers
         {
             var user = _userUnit.Users.GetUserByEmail(payload.Email);
 
+            if (user == null)
+                throw new ResourceMissingException($"User with email {payload.Email} doesn't exist!");
+
             var passwordFine = authService.VerifyHashedPassword(user.PasswordHash, payload.Password);
 
             if (passwordFine)
@@ -74,7 +78,7 @@ namespace RestaurantAPI.Services.Managers
             }
             else
             {
-                return null;
+                throw new InvalidCredentialsException("Invalid password!");
             }
 
         }
@@ -83,9 +87,8 @@ namespace RestaurantAPI.Services.Managers
         {
             var userEntity = _userUnit.Users.Get(id);
             if (userEntity == null)
-            {
-                return false;
-            }
+                throw new ResourceMissingException($"User with id {id} doesn't exist!");
+
             userEntity.Deleted = true;
             _userUnit.Users.Remove(userEntity);
             _userUnit.Complete();
@@ -95,6 +98,8 @@ namespace RestaurantAPI.Services.Managers
         public UserDTO UpdateUser(UpdateUserDTO user)
         {
             var userEntity = _mapper.Map<User>(user);
+            if (userEntity == null)
+                throw new ResourceMissingException($"User with id {user.Id} doesn't exist!");
             _userUnit.Users.Update(userEntity);
             _userUnit.Complete();
             return _mapper.Map<UserDTO>(userEntity);

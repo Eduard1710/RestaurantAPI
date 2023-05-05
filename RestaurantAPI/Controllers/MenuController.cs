@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using RestaurantAPI.Entities;
 using RestaurantAPI.ExternalModels;
+using RestaurantAPI.Infrastructure.Exceptions;
 using RestaurantAPI.Services;
 using RestaurantAPI.Services.Managers;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace RestaurantAPI.Controllers
 {
-    [Route("menu")]
+    [Route("Menu")]
     [ApiController]
     [Authorize]
     public class MenuController : ControllerBase
@@ -23,12 +24,15 @@ namespace RestaurantAPI.Controllers
         [Route("{id}", Name = "GetMenu")]
         public IActionResult GetMenu(int id)
         {
-            var menuEntity = _menuService.GetMenu(id);
-            if (menuEntity == null)
+            try
             {
-                return NotFound();
+                var menuEntity = _menuService.GetMenu(id);
+                return Ok(menuEntity);
             }
-            return Ok(menuEntity);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
@@ -37,72 +41,105 @@ namespace RestaurantAPI.Controllers
         [Produces("application/json")]
         public IActionResult GetAllMenusOrderedByName([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var menuEntities = _menuService.GetAllMenusOrderedByName(pageNumber,pageSize);
-            if (menuEntities == null)
+            try
             {
-                return NotFound();
+                var menuEntities = _menuService.GetAllMenusOrderedByName(pageNumber, pageSize);
+                return Ok(menuEntities);
             }
-            return Ok(menuEntities);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
         [Route("", Name = "GetAllMenus")]
         public IActionResult GetAllMenus()
         {
-            var menuEntities = _menuService.GetAllMenus();
-            if (menuEntities == null)
+            try
             {
-                return NotFound();
+                var menuEntities = _menuService.GetAllMenus();
+                return Ok(menuEntities);
             }
-            return Ok(menuEntities);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
-        [Route("details/{id}", Name = "GetMenuDetails")]
+        [Route("Details/{id}", Name = "GetMenuDetails")]
         public IActionResult GetMenuDetails(int id)
         {
-            var menuEntity = _menuService.GetMenuDetails(id);
-            if (menuEntity == null)
+            try
             {
-                return NotFound();
+                var menuEntity = _menuService.GetMenuDetails(id);
+                return Ok(menuEntity);
             }
-            return Ok(menuEntity);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
         [HttpPost]
-        [Route("add", Name = "AddMenu")]
+        [Route("Add", Name = "AddMenu")]
         public IActionResult AddMenu([FromBody] MenuDTO menu)
         {
-            var mEntity = _menuService.AddMenu(menu);
-            return Ok(mEntity);
+            try
+            {
+                var mEntity = _menuService.AddMenu(menu);
+                return Ok(mEntity);
+            }
+            catch (ResourceAlreadyExistsException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+        
         [HttpPut]
         [Route("{id}", Name = "UpdateMenu")]
         public IActionResult UpdateMenu([FromBody] UpdateMenuDTO menu)
         {
-            var menuEntity = _menuService.UpdateMenu(menu);
-            return Ok(menuEntity);
+            try
+            {
+                var menuEntity = _menuService.UpdateMenu(menu);
+                return Ok(menuEntity);
+            }
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
         [HttpGet]
-        [Route("category/{categoryId}", Name = "GetCategoryDetails")]
+        [Route("Category/{categoryId}", Name = "GetCategoryDetails")]
         public IActionResult GetCategoryDetails(int categoryId)
         {
-            var categoryEntity = _menuService.GetCategoryDetails(categoryId);
-            if (categoryEntity == null)
+            try
             {
-                return NotFound();
+                var categoryEntity = _menuService.GetCategoryDetails(categoryId);
+                return Ok(categoryEntity);
             }
-            return Ok(categoryEntity);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+        
         [HttpDelete]
-        [Route("delete/{id}", Name = "DeleteMenu")]
+        [Route("Delete/{id}", Name = "DeleteMenu")]
         public IActionResult DeleteMenu(int id)
         {
-            var deleteMenu = _menuService.DeleteMenu(id);
-            if (deleteMenu == false)
+            try
             {
-                return NotFound();
+                var deleteMenu = _menuService.DeleteMenu(id);
+                return NoContent();
             }
-            return NoContent();
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

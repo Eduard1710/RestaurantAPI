@@ -13,5 +13,7 @@ namespace RestaurantAPI.Services.Repositories
         TEntity Remove(TEntity entity);
         IEnumerable<TEntity> RemoveRange(IEnumerable<TEntity> entities);
         TEntity Update(TEntity entity);
+        bool Any(Func<TEntity, bool> expression);
+        IQueryable<TEntity> GetRecords();
     }
 }

@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestaurantAPI.ExternalModels;
+using RestaurantAPI.Infrastructure.Exceptions;
 using RestaurantAPI.Services;
 using RestaurantAPI.Services.Managers;
 using RestaurantAPI.Services.UnitsOfWork;
 
 namespace RestaurantAPI.Controllers
 {
-    [Route("order")]
+    [Route("Order")]
     [ApiController]
     [Authorize]
     public class OrderController : ControllerBase
@@ -23,73 +24,107 @@ namespace RestaurantAPI.Controllers
         [Route("{id}", Name = "GetOrder")]
         public IActionResult GetOrder(int id)
         {
-            var orderEntity = _orderService.GetOrder(id);
-            if (orderEntity == null)
+            try
             {
-                return NotFound();
+                var orderEntity = _orderService.GetOrder(id);
+                return Ok(orderEntity);
             }
-            return Ok(orderEntity);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
         [HttpGet]
         [Route("", Name = "GetAllOrders")]
         public IActionResult GetAllOrders()
         {
-            var orderEntities = _orderService.GetAllOrders();
-            if (orderEntities == null)
+            try
             {
-                return NotFound();
+                var orderEntities = _orderService.GetAllOrders();
+                return Ok(orderEntities);
             }
-            return Ok(orderEntities);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
         [HttpGet]
         [Route("ordered-by-address", Name = "GetAllOrdersOrderedByAddress")]
         [ProducesResponseType(typeof(PagedResult<OrderDTO>), StatusCodes.Status200OK)]
         [Produces("application/json")]
         public IActionResult GetAllOrdersOrderedByAddress([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var orderEntities = _orderService.GetAllOrdersOrderedByAddress(pageNumber, pageSize);
-            if (orderEntities == null)
+            try
             {
-                return NotFound();
+                var orderEntities = _orderService.GetAllOrdersOrderedByAddress(pageNumber, pageSize);
+                return Ok(orderEntities);
             }
-            return Ok(orderEntities);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
-        [Route("details/{id}", Name = "GetOrderDetails")]
+        [Route("Details/{id}", Name = "GetOrderDetails")]
         public IActionResult GetOrderDetails(int id)
         {
-            var orderEntity = _orderService.GetOrderDetails(id);
-            if (orderEntity == null)
+            try
             {
-                return NotFound();
+                var orderEntity = _orderService.GetOrderDetails(id);
+                return Ok(orderEntity);
             }
-            return Ok(orderEntity);
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
         [HttpPost]
-        [Route("add", Name = "AddOrder")]
+        [Route("Add", Name = "AddOrder")]
         public IActionResult AddOrder([FromBody] OrderDTO order)
         {
-            var orderEntity = _orderService.AddOrder(order);
-            return Ok(orderEntity);
+            try
+            {
+                var orderEntity = _orderService.AddOrder(order);
+                return Ok(orderEntity);
+            }
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
         [HttpDelete]
-        [Route("delete/{id}", Name = "DeleteOrder")]
+        [Route("Delete/{id}", Name = "DeleteOrder")]
         public IActionResult DeleteOrder(int id)
         {
-            var deleteOrder = _orderService.DeleteOrder(id);
-            if (deleteOrder == false)
+            try
             {
-                return NotFound();
+                var deleteOrder = _orderService.DeleteOrder(id);
+                return NoContent();
             }
-            return NoContent();
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+        
         [HttpPut]
         [Route("{id}", Name = "UpdateOrder")]
         public IActionResult UpdateOrder([FromBody] UpdateOrderDTO order)
         {
-            var orderEntity = _orderService.UpdateOrder(order);
-            return Ok(orderEntity);
+            try
+            {
+                var orderEntity = _orderService.UpdateOrder(order);
+                return Ok(orderEntity);
+            }
+            catch (ResourceMissingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

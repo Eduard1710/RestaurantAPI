@@ -47,5 +47,6 @@ namespace RestaurantAPI.Services.Repositories
         {
             return _context.Menus.Where(o => o.Deleted == false || o.Deleted == null).Count();
         }
+
     }
 }

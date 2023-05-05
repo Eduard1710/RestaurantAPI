@@ -67,5 +67,15 @@ namespace RestaurantAPI.Services.Repositories
             _context.Set<TEntity>().Update(entity);
             return entity;
         }
+
+        public bool Any(Func<TEntity, bool> expression)
+        {
+            return GetRecords().Any(expression);
+        }
+
+        public IQueryable<TEntity> GetRecords()
+        {
+            return _context.Set<TEntity>().AsQueryable<TEntity>();
+        }
     }
 }
